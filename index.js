@@ -8,12 +8,24 @@ app.use(express.json());
 const RELAY_SECRET = process.env.RELAY_SECRET;
 
 const transporter = nodemailer.createTransport({
-  host: "mail.runbox.com",
-  port: 465,
-  secure: true, // SSL
+  host: process.env.RUNBOX_HOST || "mail.runbox.com",
+  port: 587,
+  secure: false, // STARTTLS
+  requireTLS: true,
   auth: {
     user: process.env.RUNBOX_USERNAME,
     pass: process.env.RUNBOX_PASSWORD
+  },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000
+});
+
+transporter.verify(function(error, success) {
+  if (error) {
+    console.error("SMTP connection failed:", error);
+  } else {
+    console.log("SMTP connection verified, ready to send");
   }
 });
 
